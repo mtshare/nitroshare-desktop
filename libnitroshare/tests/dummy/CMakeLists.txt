@@ -6,7 +6,7 @@ set(SRC
 add_library(dummy MODULE ${SRC})
 
 set_target_properties(dummy PROPERTIES
-    CXX_STANDARD             11
+    CXX_STANDARD             17
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../plugins"
 )
 target_link_libraries(dummy nitroshare)

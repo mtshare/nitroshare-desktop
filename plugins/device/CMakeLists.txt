@@ -10,7 +10,7 @@ set(SRC
 add_library(device MODULE ${SRC})
 
 set_target_properties(device PROPERTIES
-    CXX_STANDARD             11
+    CXX_STANDARD             17
     VERSION                  ${VERSION}
     SOVERSION                ${VERSION_MAJOR}
     RUNTIME_OUTPUT_DIRECTORY "${PLUGIN_OUTPUT_DIRECTORY}"
@@ -18,7 +18,7 @@ set_target_properties(device PROPERTIES
 )
 
 target_include_directories(device PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
-target_link_libraries(device nitroshare Qt5::Core)
+target_link_libraries(device nitroshare Qt${QT_VERSION_MAJOR}::Core)
 
 install(TARGETS device
     DESTINATION "${INSTALL_PLUGIN_PATH}"

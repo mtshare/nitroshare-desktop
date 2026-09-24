@@ -42,7 +42,7 @@ endif()
 add_library(qhttpengine SHARED ${HEADERS} ${SRC})
 
 set_target_properties(qhttpengine PROPERTIES
-    CXX_STANDARD          11
+    CXX_STANDARD          17
     CXX_STANDARD_REQUIRED ON
     DEFINE_SYMBOL         QT_NO_SIGNALS_SLOTS_KEYWORDS
     DEFINE_SYMBOL         QHTTPENGINE_LIBRARY
@@ -57,7 +57,7 @@ target_include_directories(qhttpengine PUBLIC
     "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>"
 )
 
-target_link_libraries(qhttpengine Qt5::Network)
+target_link_libraries(qhttpengine Qt${QT_VERSION_MAJOR}::Network)
 
 install(TARGETS qhttpengine EXPORT qhttpengine-export
     RUNTIME DESTINATION "${BIN_INSTALL_DIR}"

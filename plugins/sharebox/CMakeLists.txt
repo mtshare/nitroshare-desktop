@@ -11,7 +11,7 @@ set(SRC
 add_library(sharebox MODULE ${SRC})
 
 set_target_properties(sharebox PROPERTIES
-    CXX_STANDARD             11
+    CXX_STANDARD             17
     VERSION                  ${VERSION}
     SOVERSION                ${VERSION_MAJOR}
     RUNTIME_OUTPUT_DIRECTORY "${PLUGIN_OUTPUT_DIRECTORY}"
@@ -19,7 +19,7 @@ set_target_properties(sharebox PROPERTIES
 )
 
 target_include_directories(sharebox PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
-target_link_libraries(sharebox nitroshare Qt5::Widgets)
+target_link_libraries(sharebox nitroshare Qt${QT_VERSION_MAJOR}::Widgets)
 
 install(TARGETS sharebox
     DESTINATION "${INSTALL_PLUGIN_PATH}"

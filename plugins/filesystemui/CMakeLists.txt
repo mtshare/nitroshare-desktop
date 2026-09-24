@@ -16,7 +16,7 @@ set(SRC
 add_library(filesystemui MODULE ${SRC})
 
 set_target_properties(filesystemui PROPERTIES
-    CXX_STANDARD             11
+    CXX_STANDARD             17
     VERSION                  ${VERSION}
     SOVERSION                ${VERSION_MAJOR}
     RUNTIME_OUTPUT_DIRECTORY "${PLUGIN_OUTPUT_DIRECTORY}"
@@ -24,7 +24,7 @@ set_target_properties(filesystemui PROPERTIES
 )
 
 target_include_directories(filesystemui PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
-target_link_libraries(filesystemui Qt5::Widgets nitroshare)
+target_link_libraries(filesystemui Qt${QT_VERSION_MAJOR}::Widgets nitroshare)
 
 install(TARGETS filesystemui
     DESTINATION "${INSTALL_PLUGIN_PATH}"

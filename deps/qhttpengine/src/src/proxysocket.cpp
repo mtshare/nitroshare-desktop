@@ -40,7 +40,7 @@ ProxySocket::ProxySocket(Socket *socket, const QString &path, const QHostAddress
     connect(&mUpstreamSocket, &QTcpSocket::readyRead, this, &ProxySocket::onUpstreamReadyRead);
     connect(
         &mUpstreamSocket,
-        static_cast<void(QAbstractSocket::*)(QAbstractSocket::SocketError)>(&QAbstractSocket::error),
+        &QAbstractSocket::errorOccurred,
         this,
         &ProxySocket::onUpstreamError
     );

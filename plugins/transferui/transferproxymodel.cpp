@@ -82,7 +82,7 @@ QVariant TransferProxyModel::data(const QModelIndex &proxyIndex, int role) const
         case ProgressColumn:
         case SpeedColumn:
         case TimeRemainingColumn:
-            return Qt::AlignRight + Qt::AlignVCenter;
+            return int(Qt::AlignRight | Qt::AlignVCenter);
         }
         break;
     }

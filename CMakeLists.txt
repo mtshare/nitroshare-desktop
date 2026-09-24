@@ -1,4 +1,8 @@
-cmake_minimum_required(VERSION 3.2.0)
+cmake_minimum_required(VERSION 3.16)
+
+# Must be set before project(); the SwiftUI app requires macOS 14+
+set(CMAKE_OSX_DEPLOYMENT_TARGET "14.0" CACHE STRING "Minimum macOS version")
+
 project(nitroshare)
 
 # Point CMake to the custom modules
@@ -19,16 +23,27 @@ set(PROJECT_VERSION_MINOR 4)
 set(PROJECT_VERSION_PATCH 0)
 set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
 
-# At the very minimum, Qt 5.4+ is required
-find_package(Qt5Network 5.4 REQUIRED)
-find_package(Qt5Widgets 5.4)
+# Prefer Qt 6, falling back to Qt 5.15 (the oldest release still supported)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Network)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Network)
+find_package(Qt${QT_VERSION_MAJOR} OPTIONAL_COMPONENTS Widgets)
+message(STATUS "Using Qt ${QT_VERSION}")
 
-# CLI and client are always available, UI is available if Qt5Widgets is available
+# CLI and client are always available, UI is available if Qt Widgets is available
 option(BUILD_CLI "Build the NitroShare CLI app" ON)
 option(BUILD_NMH "Build native messaging host for Chrome" ON)
 option(BUILD_CLIENT "Build the NitroShare client app" ON)
-if(Qt5Widgets_FOUND)
-    option(BUILD_UI "Build the NitroShare UI app" ON)
+# On macOS the native SwiftUI app replaces the Qt widgets UI by default
+if(APPLE)
+    option(BUILD_MACOS_APP "Build the native macOS app" ON)
+    set(MACOS_BUNDLE_IDENTIFIER "com.NathanOsman.NitroShare" CACHE STRING "Bundle identifier of the macOS app")
+endif()
+if(Qt${QT_VERSION_MAJOR}Widgets_FOUND)
+    if(BUILD_MACOS_APP)
+        option(BUILD_UI "Build the NitroShare UI app" OFF)
+    else()
+        option(BUILD_UI "Build the NitroShare UI app" ON)
+    endif()
 endif()
 if(WIN32)
     option(BUILD_NITROSHELL "Build shell extension for Windows Explorer" ON)
@@ -79,7 +94,7 @@ endif()
 option(BUILD_TESTS "Build test suite" OFF)
 if(BUILD_TESTS)
     enable_testing()
-    find_package(Qt5Test 5.4 REQUIRED)
+    find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test)
 endif()
 
 # Add a dependency with a builtin fallback
@@ -123,7 +138,6 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 # The library and plugins are always built
-add_subdirectory(dist)
 add_subdirectory(libnitroshare)
 add_subdirectory(plugins)
 
@@ -145,4 +159,31 @@ endif()
 
 if(WIN32 AND BUILD_NITROSHELL)
     add_subdirectory(shell)
+endif()
+
+if(BUILD_MACOS_APP)
+    add_subdirectory(macos)
+    set(MACOS_BUNDLE_EXECUTABLE NitroShare)
+else()
+    set(MACOS_BUNDLE_EXECUTABLE nitroshare-ui)
+endif()
+
+add_subdirectory(dist)
+
+if(APPLE)
+    set(MACOS_CODESIGN_IDENTITY "-" CACHE STRING "Code signing identity (\"-\" for ad-hoc)")
+
+    # Collect every plugin so that macdeployqt fixes their library references
+    set(_plugins)
+    get_property(_plugin_dirs DIRECTORY plugins PROPERTY SUBDIRECTORIES)
+    foreach(_dir ${_plugin_dirs})
+        get_property(_dir_targets DIRECTORY "${_dir}" PROPERTY BUILDSYSTEM_TARGETS)
+        list(APPEND _plugins ${_dir_targets})
+    endforeach()
+
+    include(DeployQt)
+    macdeployqt_bundle("${CONTENTS_DIRECTORY}/.." ${_plugins})
+    if(BUILD_MACOS_APP)
+        add_dependencies(deploy macos-app)
+    endif()
 endif()

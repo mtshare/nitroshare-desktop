@@ -32,7 +32,7 @@ BooleanSettingWidget::BooleanSettingWidget(Setting *setting)
     : mCheckBox(new QCheckBox(setting->title()))
 {
     QVBoxLayout *vboxLayout = new QVBoxLayout;
-    vboxLayout->setMargin(0);
+    vboxLayout->setContentsMargins(0, 0, 0, 0);
     vboxLayout->addWidget(mCheckBox);
     setLayout(vboxLayout);
 }

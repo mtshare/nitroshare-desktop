@@ -22,11 +22,11 @@ qt5_add_resources(QRC resource.qrc)
 foreach(TEST ${TESTS})
     add_executable(${TEST} ${TEST}.cpp ${QRC})
     set_target_properties(${TEST} PROPERTIES
-        CXX_STANDARD 11
+        CXX_STANDARD 17
         CXX_STANDARD_REQUIRED ON
     )
     target_include_directories(${TEST} PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
-    target_link_libraries(${TEST} Qt5::Test qhttpengine common)
+    target_link_libraries(${TEST} Qt${QT_VERSION_MAJOR}::Test qhttpengine common)
     add_test(NAME ${TEST}
         COMMAND ${TEST}
     )

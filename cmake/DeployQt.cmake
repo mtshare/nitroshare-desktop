@@ -20,11 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-find_package(Qt5Core REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 
 # Retrieve the absolute path to qmake and then use that path to find
 # the windeployqt and macdeployqt binaries
-get_target_property(_qmake_executable Qt5::qmake IMPORTED_LOCATION)
+get_target_property(_qmake_executable Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
 get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
 
 find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
@@ -74,14 +74,67 @@ function(windeployqt target)
     endforeach()
 endfunction()
 
-# Add commands that copy the required Qt files to the application bundle
-# represented by the target.
+# Record a target whose binary lives in the application bundle; the bundle is
+# deployed once by macdeployqt_bundle() after every target has been built
+# (running macdeployqt per-target lets parallel runs clobber each other)
 function(macdeployqt target)
-    add_custom_command(TARGET ${target} POST_BUILD
-        COMMAND "${MACDEPLOYQT_EXECUTABLE}"
-            \"$<TARGET_FILE_DIR:${target}>/../..\"
-            -always-overwrite
-        COMMENT "Deploying Qt..."
+    set_property(GLOBAL APPEND PROPERTY NITROSHARE_DEPLOY_TARGETS ${target})
+endfunction()
+
+# Add a target that copies the required Qt files into the application bundle
+# and then signs it (ad-hoc unless MACOS_CODESIGN_IDENTITY is set) - macOS
+# only grants local network access to apps with a valid signature
+function(macdeployqt_bundle bundle)
+    get_property(_targets GLOBAL PROPERTY NITROSHARE_DEPLOY_TARGETS)
+
+    # App extensions must be sandboxed, so re-sign the Share extension with
+    # its entitlements and then re-seal the bundle around it
+    set(_sign_extension)
+    if(MACOS_SHARE_EXTENSION)
+        set(_sign_extension
+            COMMAND codesign --force --sign "${MACOS_CODESIGN_IDENTITY}"
+                --entitlements "${MACOS_SHARE_EXTENSION_ENTITLEMENTS}"
+                "${MACOS_SHARE_EXTENSION}"
+            COMMAND codesign --force --sign "${MACOS_CODESIGN_IDENTITY}" "${bundle}"
+        )
+    endif()
+    set(_args)
+    foreach(_target ${_targets} ${ARGN})
+        list(APPEND _args "-executable=$<TARGET_FILE:${_target}>")
+    endforeach()
+
+    # Without the Qt widgets UI only the core runs, which needs no GUI plugins
+    # (letting macdeployqt pick them pulls in Qt Quick, QML, etc.); copy just
+    # the TLS and network information plugins that QtNetwork loads
+    set(_copy_plugins)
+    if(NOT BUILD_UI AND QT_VERSION_MAJOR EQUAL 6)
+        list(APPEND _args -no-plugins)
+        set(_qt_plugin_dir "${QT6_INSTALL_PREFIX}/${QT6_INSTALL_PLUGINS}")
+        foreach(_plugin
+                tls/libqsecuretransportbackend.dylib
+                tls/libqcertonlybackend.dylib
+                networkinformation/libqapplenetworkinformation.dylib)
+            get_filename_component(_plugin_type "${_plugin}" DIRECTORY)
+            list(APPEND _copy_plugins
+                COMMAND "${CMAKE_COMMAND}" -E make_directory "${bundle}/Contents/PlugIns/${_plugin_type}"
+                COMMAND "${CMAKE_COMMAND}" -E copy "${_qt_plugin_dir}/${_plugin}" "${bundle}/Contents/PlugIns/${_plugin_type}"
+            )
+            list(APPEND _args "-executable=${bundle}/Contents/PlugIns/${_plugin}")
+        endforeach()
+    endif()
+
+    add_custom_target(deploy ALL
+        ${_copy_plugins}
+        COMMAND "${MACDEPLOYQT_EXECUTABLE}" "${bundle}" -always-overwrite
+            "-libpath=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" ${_args}
+        # macdeployqt resolves the @rpath of plugins relative to PlugIns/ and
+        # leaves stray copies of the libraries there
+        COMMAND "${CMAKE_COMMAND}" -E rm -rf "${bundle}/Contents/PlugIns/Frameworks"
+        COMMAND codesign --force --deep --sign "${MACOS_CODESIGN_IDENTITY}" "${bundle}"
+        ${_sign_extension}
+        DEPENDS ${_targets} ${ARGN}
+        COMMENT "Deploying Qt and signing the application bundle..."
+        VERBATIM
     )
 endfunction()
 

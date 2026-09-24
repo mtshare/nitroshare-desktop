@@ -12,7 +12,7 @@ set(SRC
 add_library(notify-plugin MODULE ${SRC})
 
 set_target_properties(notify-plugin PROPERTIES
-    CXX_STANDARD             11
+    CXX_STANDARD             17
     OUTPUT_NAME              notify
     VERSION                  ${VERSION}
     SOVERSION                ${VERSION_MAJOR}

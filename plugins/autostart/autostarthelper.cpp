@@ -29,7 +29,7 @@
 #  include <QSettings>
 #endif
 
-#if defined(Q_OS_MACX) || defined(Q_OS_LINUX)
+#if defined(Q_OS_MACOS) || defined(Q_OS_LINUX)
 #  include <QFile>
 #endif
 
@@ -45,7 +45,7 @@ const QString Autostart = "Autostart";
 const QString RegistryKey = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run";
 #endif
 
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACOS)
 const QString AutostartPath = "Library/LaunchAgents/com.NathanOsman.NitroShare.plist";
 const QString AutostartTemplate =
     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
@@ -116,7 +116,7 @@ void AutostartHelper::enableAutostart()
 #if defined(Q_OS_WIN32)
     QSettings settings(RegistryKey, QSettings::NativeFormat);
     settings.setValue("NitroShare", pathToSelf());
-#elif defined(Q_OS_MACX) || defined(Q_OS_LINUX)
+#elif defined(Q_OS_MACOS) || defined(Q_OS_LINUX)
     FileUtil::createFile(
         QDir::home().absoluteFilePath(AutostartPath),
         AutostartTemplate.arg(pathToSelf()).toUtf8()
@@ -129,7 +129,7 @@ void AutostartHelper::disableAutostart()
 #if defined(Q_OS_WIN32)
     QSettings settings(RegistryKey, QSettings::NativeFormat);
     settings.remove("NitroShare");
-#elif defined(Q_OS_MACX) || defined(Q_OS_LINUX)
+#elif defined(Q_OS_MACOS) || defined(Q_OS_LINUX)
     QFile(QDir::home().absoluteFilePath(AutostartPath)).remove();
 #endif
 }

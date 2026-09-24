@@ -26,15 +26,15 @@
 #include <QList>
 #include <QObject>
 #include <QPair>
-#include <QRegExp>
+#include <QRegularExpression>
 
 #include <qhttpengine/handler.h>
 
 namespace QHttpEngine
 {
 
-typedef QPair<QRegExp, QString> Redirect;
-typedef QPair<QRegExp, Handler*> SubHandler;
+typedef QPair<QRegularExpression, QString> Redirect;
+typedef QPair<QRegularExpression, Handler*> SubHandler;
 
 class HandlerPrivate : public QObject
 {

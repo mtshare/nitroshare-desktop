@@ -31,7 +31,7 @@
 #include <QApplication>
 #include <QBrush>
 #include <QColor>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
 #include <QDropEvent>
@@ -71,7 +71,7 @@ ShareboxWidget::ShareboxWidget(Application *application)
     resize(WidgetSize, WidgetSize);
 
     // Position it
-    const QRect screenRect = QApplication::desktop()->availableGeometry();
+    const QRect screenRect = QApplication::primaryScreen()->availableGeometry();
     move(screenRect.right() - WidgetSize - WidgetMargin,
          screenRect.bottom() - WidgetSize - WidgetMargin);
 

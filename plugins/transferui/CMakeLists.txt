@@ -18,7 +18,7 @@ endif()
 add_library(transferui MODULE ${SRC})
 
 set_target_properties(transferui PROPERTIES
-    CXX_STANDARD             11
+    CXX_STANDARD             17
     VERSION                  ${VERSION}
     SOVERSION                ${VERSION_MAJOR}
     RUNTIME_OUTPUT_DIRECTORY "${PLUGIN_OUTPUT_DIRECTORY}"
@@ -26,7 +26,7 @@ set_target_properties(transferui PROPERTIES
 )
 
 target_include_directories(transferui PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
-target_link_libraries(transferui Qt5::Widgets nitroshare)
+target_link_libraries(transferui Qt${QT_VERSION_MAJOR}::Widgets nitroshare)
 
 if(APPLE)
     target_link_libraries(transferui "-framework ApplicationServices")

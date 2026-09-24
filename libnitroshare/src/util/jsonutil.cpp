@@ -34,7 +34,7 @@ QJsonObject JsonUtil::objectToJson(QObject *object)
     QJsonObject jsonObject;
     auto properties = QtUtil::properties(object);
     for (auto i = properties.begin(); i != properties.end(); ++i) {
-        if (i.value().type() == QVariant::LongLong) {
+        if (i.value().userType() == QMetaType::LongLong) {
             i.value().setValue(QString::number(i.value().toLongLong()));
         }
         jsonObject.insert(i.key(), QJsonValue::fromVariant(i.value()));

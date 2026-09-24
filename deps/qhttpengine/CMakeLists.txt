@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2.0)
+cmake_minimum_required(VERSION 3.16)
 project(qhttpengine)
 
 set(PROJECT_NAME "QHttpEngine")
@@ -18,7 +18,10 @@ set(INCLUDE_INSTALL_DIR include CACHE STRING "Header installation directory rela
 set(DOC_INSTALL_DIR share/doc/qhttpengine CACHE STRING "Documentation installation directory relative to the install prefix")
 set(EXAMPLES_INSTALL_DIR "${LIB_INSTALL_DIR}/qhttpengine/examples" CACHE STRING "Examples installation directory relative to the install prefix")
 
-find_package(Qt5Network 5.4 REQUIRED)
+if(NOT QT_VERSION_MAJOR)
+    find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Network)
+endif()
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Network)
 
 set(CMAKE_AUTOMOC ON)
 
@@ -37,7 +40,7 @@ endif()
 
 option(BUILD_TESTS "Build the test suite" OFF)
 if(BUILD_TESTS)
-    find_package(Qt5Test 5.4 REQUIRED)
+    find_package(Qt${QT_VERSION_MAJOR}Test REQUIRED)
     enable_testing()
     add_subdirectory(tests)
 endif()

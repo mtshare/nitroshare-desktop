@@ -24,6 +24,19 @@ A cross-platform network file transfer application designed to make transferring
 Downloads can be found on the NitroShare website:  
 https://nitroshare.net
 
+### Building on macOS
+
+On macOS NitroShare ships as a native SwiftUI app (menu bar panel, Settings window, Finder Share extension) that drives the Qt core in the background. It requires macOS 14 or newer, Xcode and Qt 6:
+
+```sh
+brew install cmake qt
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$(brew --prefix qt)"
+cmake --build build -j8
+open build/out/NitroShare.app
+```
+
+The bundle is signed ad-hoc by default; pass `-DMACOS_CODESIGN_IDENTITY="Developer ID Application: …"` to sign it with a real identity. `cmake --build build --target dmg` creates a disk image. Pass `-DBUILD_MACOS_APP=OFF` to build the Qt widgets UI instead.
+
 ### Documentation
 
 Instructions for building NitroShare from source as well as protocol descriptions can be found on [the GitHub wiki](https://github.com/nitroshare/nitroshare-desktop/wiki).

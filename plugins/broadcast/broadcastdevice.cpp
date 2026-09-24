@@ -46,7 +46,7 @@ QString BroadcastDevice::transportName() const
 
 QStringList BroadcastDevice::addresses() const
 {
-    return mAddresses.toList();
+    return mAddresses.values();
 }
 
 quint16 BroadcastDevice::port() const

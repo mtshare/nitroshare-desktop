@@ -130,7 +130,7 @@ void SettingsRegistry::begin()
 
 void SettingsRegistry::end()
 {
-    emit settingsChanged(d->groupNames.toList());
+    emit settingsChanged(d->groupNames.values());
     d->isInGroup = false;
     d->groupNames.clear();
 }

@@ -125,7 +125,7 @@ Bundle *SendItemsAction::createBundle(const QStringList &items)
                 );
                 foreach (auto &info, infoList) {
                     if (info.isDir()) {
-                        stack.push(info.absolutePath());
+                        stack.push(info.absoluteFilePath());
                     } else {
                         bundle->add(new File(root, info, BlockSize));
                     }

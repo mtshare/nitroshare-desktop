@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2.0)
+cmake_minimum_required(VERSION 3.16)
 project(qmdnsengine)
 
 set(PROJECT_NAME "QMdnsEngine")
@@ -18,7 +18,10 @@ set(INCLUDE_INSTALL_DIR include CACHE STRING "Header installation directory rela
 set(DOC_INSTALL_DIR share/doc/qmdnsengine CACHE STRING "Documentation installation directory relative to the install prefix")
 set(EXAMPLES_INSTALL_DIR "${LIB_INSTALL_DIR}/qmdnsengine/examples" CACHE STRING "Examples installation directory relative to the install prefix")
 
-find_package(Qt5Network 5.4 REQUIRED)
+if(NOT QT_VERSION_MAJOR)
+    find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Network)
+endif()
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Network)
 
 set(CMAKE_AUTOMOC ON)
 
@@ -32,13 +35,13 @@ endif()
 
 option(BUILD_EXAMPLES "Build example applications" OFF)
 if(BUILD_EXAMPLES)
-    find_package(Qt5Widgets 5.4)
+    find_package(Qt${QT_VERSION_MAJOR}Widgets)
     add_subdirectory(examples)
 endif()
 
 option(BUILD_TESTS "Build test suite" OFF)
 if(BUILD_TESTS)
-    find_package(Qt5Test 5.4 REQUIRED)
+    find_package(Qt${QT_VERSION_MAJOR}Test REQUIRED)
     enable_testing()
     add_subdirectory(tests)
 endif()

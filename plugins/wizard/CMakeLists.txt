@@ -19,7 +19,7 @@ set(SRC
 add_library(wizard MODULE ${SRC})
 
 set_target_properties(wizard PROPERTIES
-    CXX_STANDARD             11
+    CXX_STANDARD             17
     VERSION                  ${VERSION}
     SOVERSION                ${VERSION_MAJOR}
     RUNTIME_OUTPUT_DIRECTORY "${PLUGIN_OUTPUT_DIRECTORY}"
@@ -27,7 +27,7 @@ set_target_properties(wizard PROPERTIES
 )
 
 target_include_directories(wizard PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
-target_link_libraries(wizard nitroshare Qt5::Widgets)
+target_link_libraries(wizard nitroshare Qt${QT_VERSION_MAJOR}::Widgets)
 
 install(TARGETS wizard
     DESTINATION "${INSTALL_PLUGIN_PATH}"

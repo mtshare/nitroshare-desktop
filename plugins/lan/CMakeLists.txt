@@ -15,7 +15,7 @@ set(SRC
 add_library(lan MODULE ${SRC})
 
 set_target_properties(lan PROPERTIES
-    CXX_STANDARD             11
+    CXX_STANDARD             17
     VERSION                  ${VERSION}
     SOVERSION                ${VERSION_MAJOR}
     RUNTIME_OUTPUT_DIRECTORY "${PLUGIN_OUTPUT_DIRECTORY}"
@@ -23,7 +23,7 @@ set_target_properties(lan PROPERTIES
 )
 
 target_include_directories(lan PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
-target_link_libraries(lan nitroshare Qt5::Network)
+target_link_libraries(lan nitroshare Qt${QT_VERSION_MAJOR}::Network)
 
 install(TARGETS lan
     DESTINATION "${INSTALL_PLUGIN_PATH}"
@@ -32,7 +32,7 @@ install(TARGETS lan
 # If the OpenSSL DLLs live in Qt's bin dir, copy them to the runtime outout
 # directory after building the plugin
 if(WIN32)
-    get_target_property(_qmake_executable Qt5::qmake IMPORTED_LOCATION)
+    get_target_property(_qmake_executable Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
     get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
     find_program(LIBEAY32 NAME libeay32.dll HINTS "${_qt_bin_dir}")
     find_program(SSLEAY32 NAME ssleay32.dll HINTS "${_qt_bin_dir}")

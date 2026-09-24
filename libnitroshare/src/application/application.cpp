@@ -236,7 +236,7 @@ Application::OperatingSystem Application::operatingSystem() const
 {
 #if defined(Q_OS_WIN32)
     return Windows;
-#elif defined(Q_OS_MACX)
+#elif defined(Q_OS_MACOS)
     return MacOS;
 #elif defined(Q_OS_LINUX)
     return Linux;

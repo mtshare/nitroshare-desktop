@@ -74,7 +74,8 @@ QString StaticEnumerator::name() const
 void StaticEnumerator::onSettingsChanged(const QStringList &keys)
 {
     if (keys.contains(StaticDevicesName)) {
-        auto addresses = mApplication->settingsRegistry()->value(StaticDevicesName).toStringList().toSet();
+        const QStringList addressList = mApplication->settingsRegistry()->value(StaticDevicesName).toStringList();
+        QSet<QString> addresses(addressList.begin(), addressList.end());
 
         // Remove existing addresses not present in the new list
         for (auto i = mDevices.begin(); i != mDevices.end();) {

@@ -57,7 +57,7 @@ set(SRC
 add_library(nitroshare SHARED ${HEADERS} ${SRC})
 
 set_target_properties(nitroshare PROPERTIES
-    CXX_STANDARD  11
+    CXX_STANDARD  17
     DEFINE_SYMBOL QT_NO_SIGNALS_SLOTS_KEYWORDS
     DEFINE_SYMBOL NITROSHARE_LIBRARY
     PUBLIC_HEADER "${HEADERS}"
@@ -71,7 +71,7 @@ target_include_directories(nitroshare PUBLIC
     "$<INSTALL_INTERFACE:include>"
 )
 
-target_link_libraries(nitroshare Qt5::Network)
+target_link_libraries(nitroshare Qt${QT_VERSION_MAJOR}::Network)
 
 install(TARGETS nitroshare
     EXPORT        nitroshare-export

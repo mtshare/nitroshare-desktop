@@ -11,7 +11,7 @@ set(SRC
 
 add_library(nitroshell SHARED ${SRC})
 
-target_link_libraries(nitroshell nitroshare Qt5::Core)
+target_link_libraries(nitroshell nitroshare Qt${QT_VERSION_MAJOR}::Core)
 
 install(TARGETS nitroshell
     RUNTIME DESTINATION ${INSTALL_BIN_PATH}

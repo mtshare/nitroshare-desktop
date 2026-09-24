@@ -1,0 +1,74 @@
+/* Menu bar panel */
+"Starting…" = "Avvio in corso…";
+"Not available" = "Non disponibile";
+"Visible as “%@”" = "Visibile come “%@”";
+"Nearby Devices" = "Dispositivi nelle vicinanze";
+"NitroShare isn’t responding" = "NitroShare non risponde";
+"The transfer service couldn’t be started. Try quitting and reopening NitroShare." = "Impossibile avviare il servizio di trasferimento. Prova a chiudere e riaprire NitroShare.";
+"Looking for devices…" = "Ricerca dei dispositivi…";
+"Devices running NitroShare on this network will appear here." = "I dispositivi con NitroShare su questa rete appariranno qui.";
+"Transfers" = "Trasferimenti";
+"Clear" = "Cancella";
+"Open Received Files" = "Apri file ricevuti";
+"Settings…" = "Impostazioni…";
+"Quit NitroShare" = "Esci da NitroShare";
+
+/* Devices */
+"Release to send" = "Rilascia per inviare";
+"Send…" = "Invia…";
+"Click to choose files, or drop files here to send them to %@" = "Fai clic per scegliere i file, oppure trascinali qui per inviarli a %@";
+"Send to %@" = "Invia a %@";
+"Send" = "Invia";
+
+/* Transfers */
+"Cancel" = "Annulla";
+"Show in Finder" = "Mostra nel Finder";
+"Remove" = "Rimuovi";
+"To %@" = "A %@";
+"From %@" = "Da %@";
+"Connecting…" = "Connessione…";
+"%@/s — %@ remaining" = "%1$@/s — %2$@ rimanenti";
+"Failed" = "Non riuscito";
+"Sent" = "Inviato";
+"Received" = "Ricevuto";
+
+/* Notifications */
+"Files received" = "File ricevuti";
+"%@ sent you some files." = "%@ ti ha inviato dei file.";
+"Files sent" = "File inviati";
+"%@ received your files." = "%@ ha ricevuto i tuoi file.";
+"Transfer from %@ failed" = "Trasferimento da %@ non riuscito";
+"Transfer to %@ failed" = "Trasferimento a %@ non riuscito";
+
+/* Share window */
+"Share with NitroShare" = "Condividi con NitroShare";
+"%lld items" = "%lld elementi";
+"Choose a device" = "Scegli un dispositivo";
+
+/* Settings */
+"General" = "Generali";
+"Network" = "Rete";
+"Security" = "Sicurezza";
+"Device name" = "Nome dispositivo";
+"Other devices will see this Mac with this name." = "Gli altri dispositivi vedranno questo Mac con questo nome.";
+"Save received files to" = "Salva i file ricevuti in";
+"Open at login" = "Apri all’avvio";
+"Version" = "Versione";
+"Transfer port" = "Porta di trasferimento";
+"Port used to receive files. Other devices discover it automatically." = "Porta usata per ricevere i file. Gli altri dispositivi la rilevano automaticamente.";
+"Discovery" = "Rilevamento";
+"Broadcast port" = "Porta broadcast";
+"Broadcast interval (ms)" = "Intervallo broadcast (ms)";
+"Device expiry (ms)" = "Scadenza dispositivi (ms)";
+"Additional devices" = "Dispositivi aggiuntivi";
+"Addresses of devices that can’t be discovered automatically, separated by commas." = "Indirizzi dei dispositivi che non vengono rilevati automaticamente, separati da virgole.";
+"Encrypt transfers with TLS" = "Cifra i trasferimenti con TLS";
+"Both devices need certificates signed by the same certificate authority." = "Entrambi i dispositivi devono avere certificati firmati dalla stessa autorità di certificazione.";
+"Certificates" = "Certificati";
+"CA certificate" = "Certificato CA";
+"Certificate" = "Certificato";
+"Private key" = "Chiave privata";
+"Private key passphrase" = "Password della chiave privata";
+"None" = "Nessuno";
+"Choose…" = "Scegli…";
+"Other…" = "Altro…";

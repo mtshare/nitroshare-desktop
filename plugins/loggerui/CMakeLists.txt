@@ -12,7 +12,7 @@ set(SRC
 add_library(loggerui MODULE ${SRC})
 
 set_target_properties(loggerui PROPERTIES
-    CXX_STANDARD             11
+    CXX_STANDARD             17
     VERSION                  ${VERSION}
     SOVERSION                ${VERSION_MAJOR}
     RUNTIME_OUTPUT_DIRECTORY "${PLUGIN_OUTPUT_DIRECTORY}"
@@ -20,7 +20,7 @@ set_target_properties(loggerui PROPERTIES
 )
 
 target_include_directories(loggerui PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
-target_link_libraries(loggerui Qt5::Widgets nitroshare)
+target_link_libraries(loggerui Qt${QT_VERSION_MAJOR}::Widgets nitroshare)
 
 install(TARGETS loggerui
     DESTINATION "${INSTALL_PLUGIN_PATH}"

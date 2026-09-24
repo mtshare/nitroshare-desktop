@@ -12,7 +12,7 @@ set(SRC
 add_library(broadcast MODULE ${SRC})
 
 set_target_properties(broadcast PROPERTIES
-    CXX_STANDARD             11
+    CXX_STANDARD             17
     VERSION                  ${VERSION}
     SOVERSION                ${VERSION_MAJOR}
     RUNTIME_OUTPUT_DIRECTORY "${PLUGIN_OUTPUT_DIRECTORY}"
@@ -20,7 +20,7 @@ set_target_properties(broadcast PROPERTIES
 )
 
 target_include_directories(broadcast PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
-target_link_libraries(broadcast nitroshare Qt5::Network)
+target_link_libraries(broadcast nitroshare Qt${QT_VERSION_MAJOR}::Network)
 
 install(TARGETS broadcast
     DESTINATION "${INSTALL_PLUGIN_PATH}"

@@ -51,7 +51,7 @@ StringListSettingWidget::StringListSettingWidget(Setting *setting)
     hboxLayout->addWidget(mRemoveButton);
 
     QVBoxLayout *vboxLayout = new QVBoxLayout;
-    vboxLayout->setMargin(0);
+    vboxLayout->setContentsMargins(0, 0, 0, 0);
     vboxLayout->addWidget(label);
     vboxLayout->addWidget(mListWidget);
     vboxLayout->addLayout(hboxLayout);

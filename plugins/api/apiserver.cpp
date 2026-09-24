@@ -22,7 +22,7 @@
  * IN THE SOFTWARE.
  */
 
-#include <QRegExp>
+#include <QRegularExpression>
 
 #include <nitroshare/application.h>
 #include <nitroshare/logger.h>
@@ -48,8 +48,8 @@ ApiServer::ApiServer(Application *application)
           { Setting::DefaultValueKey, true }
       })
 {
-    mFileHandler.addRedirect(QRegExp("^$"), "index.html");
-    mFileHandler.addSubHandler(QRegExp("^api/"), &mActionHandler);
+    mFileHandler.addRedirect(QRegularExpression("^$"), "index.html");
+    mFileHandler.addSubHandler(QRegularExpression("^api/"), &mActionHandler);
     mActionHandler.addMiddleware(&mAuth);
 
     // Add the setting for enabling the API and watch for it changing

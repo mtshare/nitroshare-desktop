@@ -115,7 +115,7 @@ QString Util::manifestPath(Browser browser)
     // Use the folder for storing the JSON file
     return appData.absoluteFilePath("NitroShare");
 
-#elif defined(Q_OS_MACX)
+#elif defined(Q_OS_MACOS)
 
     QString path;
 

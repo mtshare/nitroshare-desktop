@@ -68,7 +68,7 @@ File::File(const QDir &root, const QFileInfo &info, int blockSize)
     mReadOnly = !info.isWritable();
     mExecutable = info.isExecutable();
 
-    mCreated = info.created().toMSecsSinceEpoch();
+    mCreated = info.birthTime().toMSecsSinceEpoch();
     mLastRead = info.lastRead().toMSecsSinceEpoch();
     mLastModified = info.lastModified().toMSecsSinceEpoch();
 }

@@ -168,7 +168,7 @@ void LanTransport::onEncrypted()
 void LanTransport::onSslErrors()
 {
     // No need to emit more than one error
-    emit error(mSslSocket->sslErrors().at(0).errorString());
+    emit error(mSslSocket->sslHandshakeErrors().at(0).errorString());
 }
 
 #endif
@@ -187,7 +187,7 @@ LanTransport::LanTransport(
 #ifdef ENABLE_TLS
     if (!sslConf.isNull()) {
         mSslSocket = new QSslSocket(this);
-        mSslSocket->ignoreSslErrors({ QSslError::HostNameMismatch });
+        mSslSocket->ignoreSslErrors({ QSslError(QSslError::HostNameMismatch) });
         mSslSocket->setSslConfiguration(sslConf);
 
         connect(mSslSocket, &QSslSocket::encrypted, this, &LanTransport::onEncrypted);
@@ -206,5 +206,5 @@ LanTransport::LanTransport(
 #endif
 
     connect(mSocket, &QTcpSocket::readyRead, this, &LanTransport::onReadyRead);
-    connect(mSocket, static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>(&QTcpSocket::error), this, &LanTransport::onError);
+    connect(mSocket, &QTcpSocket::errorOccurred, this, &LanTransport::onError);
 }

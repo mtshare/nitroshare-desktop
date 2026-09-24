@@ -48,7 +48,7 @@ void QObjectHandlerPrivate::invokeSlot(Socket *socket, Method m)
     if (m.oldSlot) {
 
         // Obtain the slot index
-        int index = m.receiver->metaObject()->indexOfSlot(m.slot.method + 1);
+        int index = m.receiver->metaObject()->indexOfSlot(m.method + 1);
         if (index == -1) {
             socket->writeError(Socket::InternalServerError);
             return;
@@ -70,11 +70,7 @@ void QObjectHandlerPrivate::invokeSlot(Socket *socket, Method m)
             return;
         }
     } else {
-        void *args[] = {
-            Q_NULLPTR,
-            &socket
-        };
-        m.slot.slotObj->call(m.receiver, args);
+        m.slot(socket);
     }
 }
 
@@ -104,7 +100,7 @@ void QObjectHandler::registerMethod(const QString &name, QObject *receiver, cons
     d->map.insert(name, QObjectHandlerPrivate::Method(receiver, method, readAll));
 }
 
-void QObjectHandler::registerMethodImpl(const QString &name, QObject *receiver, QtPrivate::QSlotObjectBase *slotObj, bool readAll)
+void QObjectHandler::registerMethodImpl(const QString &name, QObject *receiver, std::function<void(Socket *)> slot, bool readAll)
 {
-    d->map.insert(name, QObjectHandlerPrivate::Method(receiver, slotObj, readAll));
+    d->map.insert(name, QObjectHandlerPrivate::Method(receiver, slot, readAll));
 }

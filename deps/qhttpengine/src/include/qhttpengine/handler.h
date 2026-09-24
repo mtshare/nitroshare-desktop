@@ -27,7 +27,7 @@
 
 #include "qhttpengine_export.h"
 
-class QRegExp;
+class QRegularExpression;
 
 namespace QHttpEngine
 {
@@ -49,24 +49,24 @@ class QHTTPENGINE_EXPORT HandlerPrivate;
  * match.
  *
  * To add a redirect, use the addRedirect() method. The first parameter is a
- * QRegExp pattern that the request path will be tested against. If it
+ * QRegularExpression pattern that the request path will be tested against. If it
  * matches, an HTTP 302 redirect will be written to the socket and the request
  * closed. For example, to have the root path "/" redirect to "/index.html":
  *
  * @code
  * QHttpEngine::Handler handler;
- * handler.addRedirect(QRegExp("^$"), "/index.html");
+ * handler.addRedirect(QRegularExpression("^$"), "/index.html");
  * @endcode
  *
  * To add a sub-handler, use the addSubHandler() method. Again, the first
- * parameter is a QRegExp pattern. If the pattern matches, the portion of the
+ * parameter is a QRegularExpression pattern. If the pattern matches, the portion of the
  * path that matched the pattern is removed from the path and it is passed to
  * the sub-handler's route() method. For example, to have a sub-handler
  * invoked when the path begins with "/api/":
  *
  * @code
  * QHttpEngine::Handler handler, subHandler;
- * handler.addSubHandler(QRegExp("^api/"), &subHandler);
+ * handler.addSubHandler(QRegularExpression("^api/"), &subHandler);
  * @endcode
  *
  * If the request doesn't match any redirect or sub-handler patterns, it is
@@ -100,7 +100,7 @@ public:
      * The destination path may use "%1", "%2", etc. to refer to captured
      * parts of the pattern. The client will receive an HTTP 302 redirect.
      */
-    void addRedirect(const QRegExp &pattern, const QString &path);
+    void addRedirect(const QRegularExpression &pattern, const QString &path);
 
     /**
      * @brief Add a handler for a specific pattern
@@ -109,7 +109,7 @@ public:
      * used when the route() method is invoked to determine whether the
      * request matches any patterns. The order of the list is preserved.
      */
-    void addSubHandler(const QRegExp &pattern, Handler *handler);
+    void addSubHandler(const QRegularExpression &pattern, Handler *handler);
 
     /**
      * @brief Route an incoming request

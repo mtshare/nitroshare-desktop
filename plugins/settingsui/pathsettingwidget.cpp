@@ -41,12 +41,12 @@ PathSettingWidget::PathSettingWidget(Setting *setting)
     QLabel *label = new QLabel(setting->title());
 
     QHBoxLayout *hboxLayout = new QHBoxLayout;
-    hboxLayout->setMargin(0);
+    hboxLayout->setContentsMargins(0, 0, 0, 0);
     hboxLayout->addWidget(mLineEdit);
     hboxLayout->addWidget(mPushButton);
 
     QVBoxLayout *vboxLayout = new QVBoxLayout;
-    vboxLayout->setMargin(0);
+    vboxLayout->setContentsMargins(0, 0, 0, 0);
     vboxLayout->setSpacing(0);
     vboxLayout->addWidget(label);
     vboxLayout->addLayout(hboxLayout);

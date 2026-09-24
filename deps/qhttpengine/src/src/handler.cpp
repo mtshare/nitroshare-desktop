@@ -45,12 +45,12 @@ void Handler::addMiddleware(Middleware *middleware)
     d->middleware.append(middleware);
 }
 
-void Handler::addRedirect(const QRegExp &pattern, const QString &path)
+void Handler::addRedirect(const QRegularExpression &pattern, const QString &path)
 {
     d->redirects.append(Redirect(pattern, path));
 }
 
-void Handler::addSubHandler(const QRegExp &pattern, Handler *handler)
+void Handler::addSubHandler(const QRegularExpression &pattern, Handler *handler)
 {
     d->subHandlers.append(SubHandler(pattern, handler));
 }
@@ -66,9 +66,10 @@ void Handler::route(Socket *socket, const QString &path)
 
     // Check each of the redirects for a match
     foreach (Redirect redirect, d->redirects) {
-        if (redirect.first.indexIn(path) != -1) {
+        QRegularExpressionMatch match = redirect.first.match(path);
+        if (match.hasMatch()) {
             QString newPath = redirect.second;
-            foreach (QString replacement, redirect.first.capturedTexts().mid(1)) {
+            foreach (QString replacement, match.capturedTexts().mid(1)) {
                 newPath = newPath.arg(replacement);
             }
             socket->writeRedirect(newPath.toUtf8());
@@ -78,8 +79,9 @@ void Handler::route(Socket *socket, const QString &path)
 
     // Check each of the sub-handlers for a match
     foreach (SubHandler subHandler, d->subHandlers) {
-        if (subHandler.first.indexIn(path) != -1) {
-            subHandler.second->route(socket, path.mid(subHandler.first.matchedLength()));
+        QRegularExpressionMatch match = subHandler.first.match(path);
+        if (match.hasMatch()) {
+            subHandler.second->route(socket, path.mid(match.capturedLength()));
             return;
         }
     }

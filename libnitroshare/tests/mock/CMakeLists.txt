@@ -18,7 +18,7 @@ set(SRC
 add_library(mock SHARED ${SRC})
 
 set_target_properties(mock PROPERTIES
-    CXX_STANDARD             11
+    CXX_STANDARD             17
     DEFINE_SYMBOL            MOCK_LIBRARY
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.."
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.."

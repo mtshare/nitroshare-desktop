@@ -22,17 +22,16 @@ if(APPLE)
 
     # Add a target for building the DMG
     set(sym "${OUTPUT_PREFIX}/Applications")
-    set(dmg "${CMAKE_BINARY_DIR}/nitroshare-${PROJECT_VERSION}-osx.dmg")
+    set(dmg "${CMAKE_BINARY_DIR}/nitroshare-${PROJECT_VERSION}-macos.dmg")
     add_custom_target(dmg
         COMMAND rm -f \"${sym}\" \"${dmg}\"
         COMMAND ln -s /Applications \"${sym}\"
         COMMAND hdiutil create
             -srcfolder \"${OUTPUT_PREFIX}\"
             -volname "${PROJECT_NAME}"
-            -fs HFS+
-            -size 30m
+            -fs APFS
             \"${dmg}\"
-        DEPENDS nitroshare
+        DEPENDS deploy
         COMMENT "Building disk image..."
     )
 endif()

@@ -1,0 +1,8 @@
+{
+    "Name": "bridge",
+    "Title": "Native Frontend Bridge",
+    "Vendor": "Nathan Osman",
+    "Version": "${PROJECT_VERSION}",
+    "Description": "Provide actions used by native frontends (such as the macOS app) to monitor transfers and change settings",
+    "Dependencies": []
+}

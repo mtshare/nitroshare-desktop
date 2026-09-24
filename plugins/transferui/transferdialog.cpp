@@ -95,14 +95,14 @@ TransferDialog::TransferDialog(Application *application)
 
 void TransferDialog::showEvent(QShowEvent *)
 {
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     setForeground(true);
 #endif
 }
 
 void TransferDialog::hideEvent(QHideEvent *)
 {
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     setForeground(false);
 #endif
 }

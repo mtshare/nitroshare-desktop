@@ -23,6 +23,8 @@
 #ifndef QHTTPENGINE_QOBJECTHANDLER_P_H
 #define QHTTPENGINE_QOBJECTHANDLER_P_H
 
+#include <functional>
+
 #include <QMap>
 #include <QObject>
 
@@ -47,19 +49,14 @@ public:
     public:
         Method() {}
         Method(QObject *receiver, const char *method, bool readAll)
-            : receiver(receiver), oldSlot(true), slot(method), readAll(readAll) {}
-        Method(QObject *receiver, QtPrivate::QSlotObjectBase *slotObj, bool readAll)
-            : receiver(receiver), oldSlot(false), slot(slotObj), readAll(readAll) {}
+            : receiver(receiver), oldSlot(true), method(method), readAll(readAll) {}
+        Method(QObject *receiver, std::function<void(Socket *)> slot, bool readAll)
+            : receiver(receiver), oldSlot(false), method(nullptr), slot(slot), readAll(readAll) {}
 
         QObject *receiver;
         bool oldSlot;
-        union slot{
-            slot() {}
-            slot(const char *method) : method(method) {}
-            slot(QtPrivate::QSlotObjectBase *slotObj) : slotObj(slotObj) {}
-            const char *method;
-            QtPrivate::QSlotObjectBase *slotObj;
-        } slot;
+        const char *method;
+        std::function<void(Socket *)> slot;
         bool readAll;
     };
 

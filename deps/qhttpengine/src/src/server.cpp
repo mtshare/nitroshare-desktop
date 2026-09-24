@@ -91,7 +91,7 @@ void Server::incomingConnection(qintptr socketDescriptor)
         });
 
         // If an error occurs, delete the socket
-        connect(socket, static_cast<void(QAbstractSocket::*)(QAbstractSocket::SocketError)>(&QAbstractSocket::error),
+        connect(socket, &QAbstractSocket::errorOccurred,
             socket, &QSslSocket::deleteLater);
 
         socket->setSocketDescriptor(socketDescriptor);

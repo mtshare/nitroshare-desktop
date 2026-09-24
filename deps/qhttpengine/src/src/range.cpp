@@ -20,7 +20,7 @@
  * IN THE SOFTWARE.
  */
 
-#include <QRegExp>
+#include <QRegularExpression>
 
 #include <qhttpengine/range.h>
 
@@ -44,13 +44,14 @@ Range::Range()
 Range::Range(const QString &range, qint64 dataSize)
     : d(new RangePrivate(this))
 {
-    QRegExp regExp("^(\\d*)-(\\d*)$");
+    QRegularExpression regExp("^(\\d*)-(\\d*)$");
 
     int from = 0, to = -1;
 
-    if (regExp.indexIn(range.trimmed()) != -1) {
-        QString fromStr = regExp.cap(1);
-        QString toStr = regExp.cap(2);
+    QRegularExpressionMatch match = regExp.match(range.trimmed());
+    if (match.hasMatch()) {
+        QString fromStr = match.captured(1);
+        QString toStr = match.captured(2);
 
         // If both strings are empty - range is invalid. Setting to out of
         // bounds range and returning.

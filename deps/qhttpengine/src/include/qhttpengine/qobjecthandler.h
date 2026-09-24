@@ -23,6 +23,9 @@
 #ifndef QHTTPENGINE_QOBJECTHANDLER_H
 #define QHTTPENGINE_QOBJECTHANDLER_H
 
+#include <functional>
+#include <type_traits>
+
 #include <qhttpengine/handler.h>
 
 #include "qhttpengine_export.h"
@@ -116,45 +119,26 @@ public:
      */
     void registerMethod(const QString &name, QObject *receiver, Functor functor, bool readAll = true);
 #else
-    template <typename Func1>
+    template <typename Receiver, typename Class>
     inline void registerMethod(const QString &name,
-                               typename QtPrivate::FunctionPointer<Func1>::Object *receiver,
-                               Func1 slot,
+                               Receiver *receiver,
+                               void (Class::*slot)(Socket *),
                                bool readAll = true) {
-
-        typedef QtPrivate::FunctionPointer<Func1> SlotType;
-
-        // Ensure the slot doesn't have too many arguments
-        Q_STATIC_ASSERT_X(int(SlotType::ArgumentCount) == 1,
-                          "The slot must have exactly one argument.");
-
-        // Ensure the argument is of the correct type
-        Q_STATIC_ASSERT_X((QtPrivate::AreArgumentsCompatible<Socket*, typename QtPrivate::List_Select<typename SlotType::Arguments, 0>::Value>::value),
-                          "The slot parameters do not match");
-
-        // Invoke the implementation
-        registerMethodImpl(name, receiver, new QtPrivate::QSlotObject<Func1, typename SlotType::Arguments, void>(slot), readAll);
+        registerMethodImpl(name, receiver, [receiver, slot](Socket *socket) {
+            (receiver->*slot)(socket);
+        }, readAll);
     }
 
-    template <typename Func1>
-    inline typename QtPrivate::QEnableIf<!QtPrivate::AreArgumentsCompatible<Func1, QObject*>::value, void>::Type
-            registerMethod(const QString &name, Func1 slot, bool readAll = true) {
-        registerMethod(name, Q_NULLPTR, slot, readAll);
+    template <typename Functor,
+              typename = typename std::enable_if<std::is_invocable<Functor, Socket *>::value>::type>
+    inline void registerMethod(const QString &name, Functor functor, bool readAll = true) {
+        registerMethodImpl(name, nullptr, functor, readAll);
     }
 
-    template <typename Func1>
-    inline typename QtPrivate::QEnableIf<!QtPrivate::FunctionPointer<Func1>::IsPointerToMemberFunction &&
-#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
-                                             !std::is_same<const char*, Func1>::value,
-#else
-                                             !QtPrivate::is_same<const char*, Func1>::value,
-#endif
-                                         void>::Type
-            registerMethod(const QString &name, QObject *context, Func1 slot, bool readAll = true) {
-
-        // There is an easier way to do this but then the header wouldn't
-        // compile on non-C++11 compilers
-        return registerMethod_functor(name, context, slot, &Func1::operator(), readAll);
+    template <typename Functor,
+              typename = typename std::enable_if<std::is_invocable<Functor, Socket *>::value>::type>
+    inline void registerMethod(const QString &name, QObject *context, Functor functor, bool readAll = true) {
+        registerMethodImpl(name, context, functor, readAll);
     }
 #endif
 
@@ -167,25 +151,7 @@ protected:
 
 private:
 
-    template <typename Func1, typename Func1Operator>
-    inline void registerMethod_functor(const QString &name, QObject *context, Func1 slot, Func1Operator, bool readAll) {
-
-        typedef QtPrivate::FunctionPointer<Func1Operator> SlotType;
-
-        // Ensure the slot doesn't have too many arguments
-        Q_STATIC_ASSERT_X(int(SlotType::ArgumentCount) == 1,
-                          "The slot must have exactly one argument.");
-
-        // Ensure the argument is of the correct type
-        Q_STATIC_ASSERT_X((QtPrivate::AreArgumentsCompatible<Socket*, typename QtPrivate::List_Select<typename SlotType::Arguments, 0>::Value>::value),
-                          "The slot parameters do not match");
-
-        registerMethodImpl(name, context,
-                           new QtPrivate::QFunctorSlotObject<Func1, 1, typename SlotType::Arguments, void>(slot),
-                           readAll);
-    }
-
-    void registerMethodImpl(const QString &name, QObject *receiver, QtPrivate::QSlotObjectBase *slotObj, bool readAll);
+    void registerMethodImpl(const QString &name, QObject *receiver, std::function<void(Socket *)> slot, bool readAll);
 
     QObjectHandlerPrivate *const d;
     friend class QObjectHandlerPrivate;
