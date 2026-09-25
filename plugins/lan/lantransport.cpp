@@ -24,11 +24,14 @@
 
 #include <cstring>
 
+#include <QTimer>
 #include <QtEndian>
 
 #include <nitroshare/packet.h>
 
 #include "lantransport.h"
+
+const int ConnectTimeout = 10000;
 
 LanTransport::LanTransport(
     const QHostAddress &address
@@ -44,6 +47,16 @@ LanTransport::LanTransport(
       )
 {
     mSocket->connectToHost(address, port);
+
+    // Without a timeout a device that never answers (e.g. blocked by a
+    // firewall) leaves the transfer connecting for minutes
+    QTimer::singleShot(ConnectTimeout, this, [this]() {
+        if (mSocket->state() == QAbstractSocket::HostLookupState ||
+                mSocket->state() == QAbstractSocket::ConnectingState) {
+            mSocket->abort();
+            emit error(tr("the device did not respond"));
+        }
+    });
 }
 
 LanTransport::LanTransport(

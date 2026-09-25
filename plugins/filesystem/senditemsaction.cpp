@@ -124,6 +124,10 @@ Bundle *SendItemsAction::createBundle(const QStringList &items)
                     QDir::Dirs | QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot | QDir::NoSymLinks
                 );
                 foreach (auto &info, infoList) {
+                    // Finder's view settings mean nothing to the recipient
+                    if (info.fileName() == ".DS_Store") {
+                        continue;
+                    }
                     if (info.isDir()) {
                         stack.push(info.absoluteFilePath());
                     } else {

@@ -11,12 +11,14 @@ final class Notifier: NSObject, UNUserNotificationCenterDelegate {
         center.requestAuthorization(options: [.alert, .sound]) { _, _ in }
     }
 
+    /// Only called once the transfers present at launch are known, so that
+    /// transfers which were already finished don't trigger a notification
     func notifyChanges(from old: [Transfer], to new: [Transfer]) {
         let previous = Dictionary(old.map { ($0.id, $0.state) }, uniquingKeysWith: { first, _ in first })
         for transfer in new where transfer.isFinished {
-            // Only notify about transfers seen in progress, not ones that
-            // were already finished when the app started
-            guard let state = previous[transfer.id], state != transfer.state else { continue }
+            // Transfers can fail before they are ever seen in progress (e.g.
+            // when the device can't be reached), so new ones count as well
+            if let state = previous[transfer.id], state == transfer.state { continue }
             post(for: transfer)
         }
     }
@@ -34,10 +36,10 @@ final class Notifier: NSObject, UNUserNotificationCenterDelegate {
             content.body = String(localized: "\(device) received your files.")
         case (.receive, _):
             content.title = String(localized: "Transfer from \(device) failed")
-            content.body = transfer.error
+            content.body = transfer.displayError
         case (.send, _):
             content.title = String(localized: "Transfer to \(device) failed")
-            content.body = transfer.error
+            content.body = transfer.displayError
         }
         content.sound = .default
         center.add(UNNotificationRequest(identifier: transfer.id, content: content, trigger: nil))

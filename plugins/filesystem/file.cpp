@@ -55,6 +55,12 @@ File::File(const QString &root, const QVariantMap &properties)
         properties.value("last_read").toLongLong()).toLongLong();
     mLastModified = properties.value("lastModified",
         properties.value("last_modified").toLongLong()).toLongLong();
+
+    // NitroShare 0.3.x includes "directory" in every item header
+    mDirectory = properties.value("directory").toBool();
+    if (mDirectory) {
+        mSize = 0;
+    }
 }
 
 File::File(const QDir &root, const QFileInfo &info, int blockSize)
@@ -71,6 +77,8 @@ File::File(const QDir &root, const QFileInfo &info, int blockSize)
     mCreated = info.birthTime().toMSecsSinceEpoch();
     mLastRead = info.lastRead().toMSecsSinceEpoch();
     mLastModified = info.lastModified().toMSecsSinceEpoch();
+
+    mDirectory = false;
 }
 
 bool File::readOnly() const
@@ -108,6 +116,11 @@ qint64 File::last_modified() const
     return mLastModified;
 }
 
+bool File::directory() const
+{
+    return mDirectory;
+}
+
 QString File::type() const
 {
     return "file";
@@ -123,10 +136,39 @@ qint64 File::size() const
     return mSize;
 }
 
+/**
+ * @brief Find a filename that isn't taken, as Finder does: "name 2.ext"
+ */
+static QString uniqueFilename(const QString &filename)
+{
+    QFileInfo info(filename);
+    if (!info.exists()) {
+        return filename;
+    }
+
+    QString baseName = info.completeBaseName();
+    QString suffix = info.suffix().isEmpty() ? QString() : "." + info.suffix();
+    QDir dir = info.dir();
+    for (int i = 2;; ++i) {
+        QString candidate = dir.absoluteFilePath(QString("%1 %2%3").arg(baseName).arg(i).arg(suffix));
+        if (!QFileInfo::exists(candidate)) {
+            return candidate;
+        }
+    }
+}
+
 bool File::open(OpenMode openMode)
 {
-    if (openMode == Write && !QDir(QFileInfo(mFile.fileName()).absolutePath()).mkpath(".")) {
-        return false;
+    if (openMode == Write) {
+        if (mDirectory) {
+            return QDir(mFile.fileName()).mkpath(".");
+        }
+        if (!QDir(QFileInfo(mFile.fileName()).absolutePath()).mkpath(".")) {
+            return false;
+        }
+
+        // Never overwrite a file that is already there
+        mFile.setFileName(uniqueFilename(mFile.fileName()));
     }
     return mFile.open(openMode == Read ? QIODevice::ReadOnly : QIODevice::WriteOnly);
 }
@@ -170,6 +212,10 @@ void unixTimestampMsToFiletime(qint64 timestampMs, LPFILETIME pft)
 
 void File::close()
 {
+    if (mDirectory) {
+        return;
+    }
+
     mFile.close();
 
 #if defined(Q_OS_WIN32)

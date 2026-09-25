@@ -24,6 +24,7 @@ final class AppModel {
     private let notifier = Notifier()
     private var pollTask: Task<Void, Never>?
     private var failedPolls = 0
+    private var hasLoadedTransfers = false
 
     var activeTransfers: [Transfer] { transfers.filter { !$0.isFinished } }
 
@@ -60,8 +61,12 @@ final class AppModel {
                 await reloadSettings()
             }
 
-            notifier.notifyChanges(from: self.transfers, to: transfers)
-            self.devices = Self.uniqueDevices(devices)
+            if hasLoadedTransfers {
+                notifier.notifyChanges(from: self.transfers, to: transfers)
+            }
+            hasLoadedTransfers = true
+            // The core also finds this Mac through its own announcements
+            self.devices = Self.uniqueDevices(devices).filter { $0.uuid != status?.deviceUuid }
             self.transfers = transfers
             connection = .connected
             failedPolls = 0
@@ -75,19 +80,30 @@ final class AppModel {
         }
     }
 
-    /// The same device can be found by several enumerators (mDNS, broadcast)
+    /// The same device can be found by several enumerators (mDNS, broadcast);
+    /// keep one entry per device, preferring one that can be connected to
     private static func uniqueDevices(_ devices: [Device]) -> [Device] {
-        var seen = Set<String>()
-        return devices
-            .filter { seen.insert($0.uuid).inserted }
+        var byUuid: [String: Device] = [:]
+        for device in devices {
+            if let existing = byUuid[device.uuid], existing.isReachable || !device.isReachable {
+                continue
+            }
+            byUuid[device.uuid] = device
+        }
+        return byUuid.values
             .sorted { $0.displayName.localizedStandardCompare($1.displayName) == .orderedAscending }
     }
 
     // MARK: Transfers
 
-    func send(_ urls: [URL], to device: Device) {
+    /// The NitroShare window is shown so the progress can be followed, unless
+    /// the caller shows it itself (the share window does, on its devices)
+    func send(_ urls: [URL], to device: Device, showingWindow: Bool = true) {
         let items = urls.filter(\.isFileURL).map(\.path)
         guard !items.isEmpty else { return }
+        if showingWindow {
+            TransfersPanel.shared.show()
+        }
         Task {
             _ = try? await api.call("senditems", [
                 "device": device.uuid,
@@ -99,17 +115,21 @@ final class AppModel {
     }
 
     func chooseAndSend(to device: Device) {
-        let panel = NSOpenPanel()
-        panel.title = String(localized: "Send to \(device.displayName)")
-        panel.prompt = String(localized: "Send")
-        panel.canChooseFiles = true
-        panel.canChooseDirectories = true
-        panel.allowsMultipleSelection = true
-        NSApp.activate()
-        panel.begin { [weak self] response in
-            guard response == .OK else { return }
-            let urls = panel.urls
-            Task { @MainActor in self?.send(urls, to: device) }
+        ItemPicker.choose(
+            title: String(localized: "Send to \(device.displayName)"),
+            prompt: String(localized: "Send")
+        ) { [weak self] urls in
+            self?.send(urls, to: device)
+        }
+    }
+
+    /// Choose items first, then the device in the share window
+    func chooseAndShare() {
+        ItemPicker.choose(
+            title: String(localized: "Choose the items to send"),
+            prompt: String(localized: "Choose")
+        ) { urls in
+            SharePanel.shared.present(urls)
         }
     }
 

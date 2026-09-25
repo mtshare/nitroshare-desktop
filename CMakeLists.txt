@@ -19,7 +19,7 @@ set(PROJECT_AUTHOR "Nathan Osman")
 set(PROJECT_URL "https://nitroshare.net")
 
 set(PROJECT_VERSION_MAJOR 0)
-set(PROJECT_VERSION_MINOR 4)
+set(PROJECT_VERSION_MINOR 5)
 set(PROJECT_VERSION_PATCH 0)
 set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
 
@@ -133,6 +133,15 @@ endif()
 
 # Ensure that binaries are built with the RPATH set correctly
 set(CMAKE_MACOSX_RPATH ON)
+
+# On macOS everything is loaded by an executable in Contents/MacOS, so point
+# the RPATH at the bundle's Frameworks directory rather than at the absolute
+# build path - otherwise a bundle run from elsewhere (e.g. a mounted disk
+# image) can load a second copy of the libraries from the build directory
+if(APPLE)
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+    set(CMAKE_INSTALL_RPATH "@executable_path/../Frameworks")
+endif()
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)

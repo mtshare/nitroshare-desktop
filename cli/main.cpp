@@ -26,6 +26,11 @@
 
 #include <QCommandLineParser>
 #include <QCoreApplication>
+#include <QTimer>
+
+#ifdef Q_OS_UNIX
+#  include <unistd.h>
+#endif
 
 #include <nitroshare/apiutil.h>
 #include <nitroshare/application.h>
@@ -63,6 +68,11 @@ int main(int argc, char **argv)
     QObject::connect(application.logger(), &Logger::messageLogged, &stderrWriter, &StderrWriter::writeMessage);
 
     // Add the CLI arguments
+    QCommandLineOption exitWithParentOption(
+        "exit-with-parent",
+        QObject::tr("Quit when the process that launched NitroShare exits.")
+    );
+    parser.addOption(exitWithParentOption);
     application.addCliOptions(&parser);
     parser.addHelpOption();
     parser.addVersionOption();
@@ -70,6 +80,22 @@ int main(int argc, char **argv)
     // Process the CLI arguments
     parser.process(app);
     application.processCliOptions(&parser);
+
+#ifdef Q_OS_UNIX
+    // An app running the core in the background may be force quit or crash
+    // without stopping it; the orphaned core would keep the ports and block
+    // the next launch, so quit as soon as the parent is gone
+    QTimer parentTimer;
+    if (parser.isSet(exitWithParentOption)) {
+        const pid_t parent = getppid();
+        QObject::connect(&parentTimer, &QTimer::timeout, &app, [&app, parent]() {
+            if (getppid() != parent) {
+                app.quit();
+            }
+        });
+        parentTimer.start(1000);
+    }
+#endif
 
     return app.exec();
 }

@@ -9,6 +9,7 @@ struct DeviceRow: View {
 
     var body: some View {
         Button {
+            MenuPanel.close()
             model.chooseAndSend(to: device)
         } label: {
             HStack(spacing: 10) {

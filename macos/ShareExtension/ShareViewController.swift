@@ -14,17 +14,24 @@ final class ShareViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let providers = (extensionContext?.inputItems as? [NSExtensionItem] ?? [])
+        // Finder may describe folders only as directories, not as file URLs
+        let types = [UTType.fileURL.identifier, UTType.directory.identifier]
+        let attachments = (extensionContext?.inputItems as? [NSExtensionItem] ?? [])
             .flatMap { $0.attachments ?? [] }
-            .filter { $0.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) }
+        let providers = attachments.compactMap { provider -> (NSItemProvider, String)? in
+            guard let type = types.first(where: { provider.hasItemConformingToTypeIdentifier($0) }) else {
+                return nil
+            }
+            return (provider, type)
+        }
 
         let group = DispatchGroup()
         let lock = NSLock()
         var paths: [String] = []
 
-        for provider in providers {
+        for (provider, type) in providers {
             group.enter()
-            provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier) { item, _ in
+            provider.loadItem(forTypeIdentifier: type) { item, _ in
                 defer { group.leave() }
                 var url = item as? URL
                 if url == nil, let data = item as? Data {

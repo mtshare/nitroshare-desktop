@@ -5,8 +5,12 @@ struct Device: Decodable, Identifiable, Hashable, Sendable {
     let name: String
     let deviceEnumeratorName: String
     let addresses: [String]?
+    let port: Int?
 
     var id: String { uuid }
+
+    /// Devices without a port can't be connected to
+    var isReachable: Bool { (port ?? 0) > 0 }
 
     /// Enumerators append their name (e.g. " [mDNS]") to the device name
     var displayName: String {
@@ -54,6 +58,20 @@ struct Transfer: Decodable, Identifiable, Hashable, Sendable {
 
     var displayDeviceName: String {
         deviceName.replacing(/\s*\[[^\]]*\]$/, with: "")
+    }
+
+    /// The core reports errors in English; explain the common ones
+    var displayError: String {
+        if error.contains("did not respond") || error.contains("transport") {
+            return String(localized: "The device didn’t respond. Make sure it’s on the same network and NitroShare is open.")
+        }
+        if error.contains("refused") {
+            return String(localized: "The device refused the connection. Make sure NitroShare is open on it.")
+        }
+        if error.contains("closed") {
+            return String(localized: "The connection was interrupted.")
+        }
+        return error
     }
 }
 

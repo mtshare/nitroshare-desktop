@@ -50,6 +50,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    /// Opening NitroShare again while it's running (from Finder, Launchpad or
+    /// Spotlight) shows its window, since it has no Dock icon to click
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        MainActor.assumeIsolated {
+            TransfersPanel.shared.show()
+        }
+        return false
+    }
+
     func applicationWillTerminate(_ notification: Notification) {
         MainActor.assumeIsolated {
             AppModel.shared.stop()

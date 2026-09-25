@@ -47,6 +47,7 @@ class File : public Item
     // Properties provided for legacy support
     Q_PROPERTY(qint64 last_read READ last_read)
     Q_PROPERTY(qint64 last_modified READ last_modified)
+    Q_PROPERTY(bool directory READ directory)
 
 public:
 
@@ -61,6 +62,7 @@ public:
 
     qint64 last_read() const;
     qint64 last_modified() const;
+    bool directory() const;
 
     // Reimplemented virtual methods
     virtual QString type() const;
@@ -86,6 +88,9 @@ private:
     qint64 mCreated;
     qint64 mLastRead;
     qint64 mLastModified;
+
+    // Older versions send empty directories as items
+    bool mDirectory;
 };
 
 #endif // FILE_H

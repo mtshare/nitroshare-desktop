@@ -5,6 +5,14 @@ struct MenuPanel: View {
     @Environment(AppModel.self) private var model
     @Environment(\.openSettings) private var openSettings
 
+    /// The menu bar window doesn't always close when another window takes
+    /// over (e.g. the file picker), so items that open one close it first
+    static func close() {
+        window?.orderOut(nil)
+    }
+
+    fileprivate static weak var window: NSWindow?
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
@@ -36,6 +44,7 @@ struct MenuPanel: View {
                 .padding(.vertical, 6)
         }
         .frame(width: 340)
+        .background(WindowReader { MenuPanel.window = $0 })
     }
 
     // MARK: Header
@@ -128,10 +137,20 @@ struct MenuPanel: View {
 
     private var footer: some View {
         VStack(spacing: 0) {
+            MenuRow(title: "Send Files…") {
+                MenuPanel.close()
+                model.chooseAndShare()
+            }
+            MenuRow(title: "Open NitroShare Window") {
+                MenuPanel.close()
+                TransfersPanel.shared.show()
+            }
             MenuRow(title: "Open Received Files") {
+                MenuPanel.close()
                 model.revealReceivedFiles()
             }
             MenuRow(title: "Settings…") {
+                MenuPanel.close()
                 NSApp.activate()
                 openSettings()
             }
@@ -143,6 +162,21 @@ struct MenuPanel: View {
 }
 
 // MARK: - Components
+
+/// Reports the window hosting a SwiftUI view
+private struct WindowReader: NSViewRepresentable {
+    let onWindow: (NSWindow?) -> Void
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async { onWindow(view.window) }
+        return view
+    }
+
+    func updateNSView(_ view: NSView, context: Context) {
+        DispatchQueue.main.async { onWindow(view.window) }
+    }
+}
 
 struct SectionTitle: View {
     let title: LocalizedStringKey
@@ -192,12 +226,13 @@ struct RowIcon: View {
     let symbol: String
     var tint: Color = .accentColor
     var isHighlighted = true
+    var diameter: CGFloat = 28
 
     var body: some View {
         Image(systemName: symbol)
-            .font(.system(size: 13, weight: .medium))
+            .font(.system(size: diameter * 0.46, weight: .medium))
             .foregroundStyle(isHighlighted ? .white : .primary)
-            .frame(width: 28, height: 28)
+            .frame(width: diameter, height: diameter)
             .background(
                 Circle().fill(isHighlighted ? AnyShapeStyle(tint) : AnyShapeStyle(.quaternary))
             )

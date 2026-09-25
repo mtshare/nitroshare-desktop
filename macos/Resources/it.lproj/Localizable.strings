@@ -10,6 +10,9 @@
 "Transfers" = "Trasferimenti";
 "Clear" = "Cancella";
 "Open Received Files" = "Apri file ricevuti";
+"Open NitroShare Window" = "Apri la finestra di NitroShare";
+"No transfers" = "Nessun trasferimento";
+"Files you send or receive will appear here." = "I file che invii o ricevi appariranno qui.";
 "Settings…" = "Impostazioni…";
 "Quit NitroShare" = "Esci da NitroShare";
 
@@ -19,6 +22,9 @@
 "Click to choose files, or drop files here to send them to %@" = "Fai clic per scegliere i file, oppure trascinali qui per inviarli a %@";
 "Send to %@" = "Invia a %@";
 "Send" = "Invia";
+"Send Files…" = "Invia file…";
+"Choose the items to send" = "Scegli gli elementi da inviare";
+"Choose" = "Scegli";
 
 /* Transfers */
 "Cancel" = "Annulla";
@@ -29,8 +35,18 @@
 "Connecting…" = "Connessione…";
 "%@/s — %@ remaining" = "%1$@/s — %2$@ rimanenti";
 "Failed" = "Non riuscito";
+"The device didn’t respond. Make sure it’s on the same network and NitroShare is open." = "Il dispositivo non ha risposto. Controlla che sia sulla stessa rete e che NitroShare sia aperto.";
+"The device refused the connection. Make sure NitroShare is open on it." = "Il dispositivo ha rifiutato la connessione. Controlla che NitroShare sia aperto.";
+"The connection was interrupted." = "La connessione si è interrotta.";
 "Sent" = "Inviato";
 "Received" = "Ricevuto";
+"Cancel Transfer" = "Annulla trasferimento";
+"Remove from List" = "Rimuovi dall’elenco";
+"Remove finished transfers from the list" = "Rimuovi dall’elenco i trasferimenti conclusi";
+
+/* NitroShare window */
+"Choose files to send to a nearby device (⌘O)" = "Scegli i file da inviare a un dispositivo nelle vicinanze (⌘O)";
+"Drop files on a device, or click it to choose them." = "Trascina i file su un dispositivo, oppure fai clic per sceglierli.";
 
 /* Notifications */
 "Files received" = "File ricevuti";
@@ -44,6 +60,11 @@
 "Share with NitroShare" = "Condividi con NitroShare";
 "%lld items" = "%lld elementi";
 "Choose a device" = "Scegli un dispositivo";
+"Choose one or more devices." = "Scegli uno o più dispositivi.";
+"You can choose more devices." = "Puoi scegliere altri dispositivi.";
+"Done" = "Fine";
+"Waiting…" = "In attesa…";
+"Folder" = "Cartella";
 
 /* Settings */
 "General" = "Generali";

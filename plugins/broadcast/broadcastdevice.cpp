@@ -51,7 +51,8 @@ QStringList BroadcastDevice::addresses() const
 
 quint16 BroadcastDevice::port() const
 {
-    return mObject.value("port").toInt();
+    // NitroShare 0.3.x sends the port as a string
+    return mObject.value("port").toVariant().toInt();
 }
 
 void BroadcastDevice::update(qint64 curMs, const QHostAddress &address, const QJsonObject &object)

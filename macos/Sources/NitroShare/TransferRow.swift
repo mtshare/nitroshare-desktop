@@ -3,25 +3,28 @@ import SwiftUI
 struct TransferRow: View {
     @Environment(AppModel.self) private var model
     let transfer: Transfer
+    /// Larger layout used in the NitroShare window
+    var isLarge = false
 
     @State private var isHovered = false
 
     var body: some View {
-        HStack(spacing: 10) {
-            RowIcon(symbol: symbol, tint: tint)
+        HStack(spacing: isLarge ? 12 : 10) {
+            RowIcon(symbol: symbol, tint: tint, diameter: isLarge ? 36 : 28)
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: isLarge ? 4 : 3) {
                 Text(title)
+                    .font(isLarge ? .body.weight(.medium) : .body)
                     .lineLimit(1)
 
                 if !transfer.isFinished {
                     ProgressView(value: Double(transfer.progress), total: 100)
                         .progressViewStyle(.linear)
-                        .controlSize(.small)
+                        .controlSize(isLarge ? .regular : .small)
                 }
 
                 Text(subtitle)
-                    .font(.caption)
+                    .font(isLarge ? .callout : .caption)
                     .foregroundStyle(transfer.state == .failed ? AnyShapeStyle(.red) : AnyShapeStyle(.secondary))
                     .lineLimit(2)
                     .monospacedDigit()
@@ -31,34 +34,56 @@ struct TransferRow: View {
 
             accessory
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 5)
+        .padding(.horizontal, isLarge ? 10 : 8)
+        .padding(.vertical, isLarge ? 8 : 5)
+        .contentShape(Rectangle())
         .background(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
+            RoundedRectangle(cornerRadius: isLarge ? 10 : 8, style: .continuous)
                 .fill(isHovered ? AnyShapeStyle(.quaternary) : AnyShapeStyle(.clear))
         )
         .onHover { isHovered = $0 }
+        .contextMenu { contextMenu }
         .animation(.default, value: transfer.state)
     }
+
+    private var buttonDiameter: CGFloat { isLarge ? 24 : 18 }
 
     @ViewBuilder
     private var accessory: some View {
         if !transfer.isFinished {
-            CircleButton(symbol: "xmark", help: "Cancel") {
+            CircleButton(symbol: "xmark", help: "Cancel", diameter: buttonDiameter) {
                 model.cancel(transfer)
             }
         } else {
-            HStack(spacing: 4) {
+            HStack(spacing: isLarge ? 6 : 4) {
                 if transfer.direction == .receive && transfer.state == .succeeded {
-                    CircleButton(symbol: "magnifyingglass", help: "Show in Finder") {
+                    CircleButton(symbol: "magnifyingglass", help: "Show in Finder", diameter: buttonDiameter) {
                         model.revealReceivedFiles()
                     }
                 }
                 if isHovered {
-                    CircleButton(symbol: "xmark", help: "Remove") {
+                    CircleButton(symbol: "xmark", help: "Remove", diameter: buttonDiameter) {
                         model.dismiss(transfer)
                     }
                 }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var contextMenu: some View {
+        if !transfer.isFinished {
+            Button("Cancel Transfer") {
+                model.cancel(transfer)
+            }
+        } else {
+            if transfer.direction == .receive && transfer.state == .succeeded {
+                Button("Show in Finder") {
+                    model.revealReceivedFiles()
+                }
+            }
+            Button("Remove from List") {
+                model.dismiss(transfer)
             }
         }
     }
@@ -107,26 +132,28 @@ struct TransferRow: View {
             let remaining = Duration.seconds(seconds).formatted(.units(allowed: [.hours, .minutes, .seconds], width: .abbreviated, maximumUnitCount: 2))
             return String(localized: "\(speed)/s — \(remaining) remaining")
         case .failed:
-            return transfer.error.isEmpty ? String(localized: "Failed") : transfer.error
+            return transfer.error.isEmpty ? String(localized: "Failed") : transfer.displayError
         case .succeeded:
             return transfer.direction == .send ? String(localized: "Sent") : String(localized: "Received")
         }
     }
 }
 
-/// Small borderless circular button used for row actions
+/// Borderless circular button used for row actions
 struct CircleButton: View {
     let symbol: String
     let help: LocalizedStringKey
+    var diameter: CGFloat = 18
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             Image(systemName: symbol)
-                .font(.system(size: 9, weight: .bold))
+                .font(.system(size: diameter / 2, weight: .bold))
                 .foregroundStyle(.secondary)
-                .frame(width: 18, height: 18)
+                .frame(width: diameter, height: diameter)
                 .background(Circle().fill(.quaternary))
+                .contentShape(Circle())
         }
         .buttonStyle(.plain)
         .help(Text(help))

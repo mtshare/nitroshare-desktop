@@ -8,3 +8,7 @@ Thumbs.db
 # Build directories
 /build/
 /macos/.build/
+/build-release/
+
+# Log written by aqtinstall when scripts/release-macos.sh downloads Qt
+/aqtinstall.log

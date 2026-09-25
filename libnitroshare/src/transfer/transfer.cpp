@@ -214,18 +214,10 @@ void TransferPrivate::processItemHeader(Packet *packet)
     }
 
     // In order to maintain compatibility with legacy versions (which is very
-    // desirable), if "type" is not in the object, assume "file" unless
-    // "directory" is present (in which case, use that)
-    QString type;
-    if (object.contains("type")) {
-        type = object.value("type").toString();
-    } else {
-        if (object.contains("directory")) {
-            type = "directory";
-        } else {
-            type = "file";
-        }
-    }
+    // desirable), if "type" is not in the object, assume "file"; legacy
+    // versions include "directory" in every header (usually false), and the
+    // file handler creates the directory when it is true
+    QString type = object.value("type").toString("file");
 
     // Attempt to locate a handler for the type
     Handler *handler = mApplication->handlerRegistry()->find(type);
